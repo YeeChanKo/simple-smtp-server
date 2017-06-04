@@ -1,7 +1,12 @@
 package smtp.server.handler;
 
-import smtp.server.model.Mail;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface SmtpHandler {
-	public abstract String handle(String line, Mail mail);
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SmtpHandler {
+	String[] value();
 }

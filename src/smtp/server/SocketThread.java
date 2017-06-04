@@ -4,23 +4,19 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Map;
 
-import smtp.server.constant.SmtpHeader;
 import smtp.server.constant.SmtpResponse;
-import smtp.server.handler.DataBodyHandler;
-import smtp.server.handler.SmtpHandler;
+import smtp.server.handler.HandlerMapper;
 import smtp.server.model.Mail;
 
 public class SocketThread extends Thread {
 
 	private Socket socket;
-	private Map<SmtpHeader, SmtpHandler> headerHandlers;
+	private HandlerMapper hm;
 
-	public SocketThread(Socket socket,
-			Map<SmtpHeader, SmtpHandler> headerHandlers) {
+	public SocketThread(Socket socket, HandlerMapper hm) {
 		this.socket = socket;
-		this.headerHandlers = headerHandlers;
+		this.hm = hm;
 	}
 
 	public void run() {
@@ -48,7 +44,7 @@ public class SocketThread extends Thread {
 		while (true) {
 			// check if client disconnected
 			try {
-				in.mark(2); // 2 chars read ahead limit
+				in.mark(10);
 				if (in.read() == -1) {
 					System.out.println(
 							String.format("%s:%s CONNECTION CLOSED BY CLIENT!",
@@ -84,6 +80,10 @@ public class SocketThread extends Thread {
 			if (response.equals(SmtpResponse.QUIT)) {
 				try {
 					socket.close();
+					System.out.println(
+							String.format("%s:%s CONNECTION CLOSED BY SERVER!",
+									socket.getInetAddress().getHostAddress(),
+									socket.getPort()));
 					return; // end of thread
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -100,7 +100,7 @@ public class SocketThread extends Thread {
 
 	public String executeHandler(String line, Mail mail) {
 		if (mail.getDataFlag() == false) {
-			// check if line is null or empty
+			// check if line is null or empty or too short for header
 			if (line == null || line.isEmpty() || line.length() < 4) {
 				return SmtpResponse.ERROR_SYNTAX;
 			}
@@ -109,27 +109,15 @@ public class SocketThread extends Thread {
 			String header = line.substring(0, 4);
 
 			// check if header is recognizable
-			if (!isValidSmtpHeader(header)) {
+			if (!hm.isValidKey(header)) {
 				return SmtpResponse.ERROR_SYNTAX;
 			}
 
-			SmtpHandler handler = headerHandlers
-					.get(SmtpHeader.valueOf(header));
-			return handler.handle(line, mail);
+			return hm.executeMethod(header, line, mail);
 
 		} else {
 			// if client is sending data
-			// TODO: put this in handler map as well
-			return new DataBodyHandler().handle(line, mail);
+			return hm.executeMethod("DATA_BODY", line, mail);
 		}
-	}
-
-	public boolean isValidSmtpHeader(String test) {
-		for (SmtpHeader header : SmtpHeader.values()) {
-			if (header.name().equals(test)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

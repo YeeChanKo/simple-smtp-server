@@ -7,10 +7,31 @@ import smtp.server.Main;
 import smtp.server.constant.SmtpResponse;
 import smtp.server.model.Mail;
 
-public class RcptHeaderHandler implements SmtpHandler {
+public class HeaderHandler {
 
-	@Override
-	public String handle(String line, Mail mail) {
+	@SmtpHandler({ "HELO", "EHLO" })
+	public String helo(String line, Mail mail) {
+		return SmtpResponse.OKAY;
+	}
+
+	@SmtpHandler("MAIL")
+	public String mail(String line, Mail mail) {
+		// remove white space because of java regex limitation
+		line = line.replaceAll(" ", "");
+		Pattern p = Pattern.compile("MAILFROM:<(.*?@.*?)>");
+		Matcher m = p.matcher(line);
+
+		if (m.find()) {
+			String sender = m.group(1);
+			mail.setSender(sender);
+			return SmtpResponse.OKAY;
+		} else {
+			return SmtpResponse.ERROR_ARGUMENT;
+		}
+	}
+
+	@SmtpHandler("RCPT")
+	public String rcpt(String line, Mail mail) {
 		// remove white space because of java regex limitation
 		line = line.replaceAll(" ", "");
 		Pattern p = Pattern.compile("RCPTTO:<(.*?)@(.*?)>");
@@ -37,5 +58,16 @@ public class RcptHeaderHandler implements SmtpHandler {
 		} else {
 			return SmtpResponse.ERROR_ARGUMENT;
 		}
+	}
+
+	@SmtpHandler("DATA")
+	public String data(String line, Mail mail) {
+		mail.setDataFlag(true);
+		return SmtpResponse.DATA_START;
+	}
+
+	@SmtpHandler("QUIT")
+	public String quit(String line, Mail mail) {
+		return SmtpResponse.QUIT;
 	}
 }

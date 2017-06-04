@@ -3,10 +3,10 @@ package smtp.server.handler;
 import smtp.server.constant.SmtpResponse;
 import smtp.server.model.Mail;
 
-public class DataBodyHandler implements SmtpHandler {
+public class BodyHandler {
 
-	@Override
-	public String handle(String line, Mail mail) {
+	@SmtpHandler("DATA_BODY")
+	public String data(String line, Mail mail) {
 		if (line.equals(".")) {
 			mail.setDataFlag(false);
 			return mail.flushDataAndSave();

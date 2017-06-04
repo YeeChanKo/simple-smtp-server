@@ -7,9 +7,7 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import smtp.server.constant.SmtpResponse;
 
@@ -71,11 +69,8 @@ public class Mail {
 		// create file and write serialized map object
 		try (FileOutputStream fout = new FileOutputStream(dirPath + date);
 				ObjectOutput out = new ObjectOutputStream(fout);) {
-			Map<String, Object> mail = new HashMap<>();
-			mail.put("sender", sender);
-			mail.put("recipients", recipients);
-			mail.put("data", dataContent);
-			out.writeObject(mail);
+			MailFile mailFile = new MailFile(sender, recipients, dataContent);
+			out.writeObject(mailFile);
 			out.flush();
 			return SmtpResponse.OKAY;
 		} catch (IOException e) {
