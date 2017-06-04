@@ -74,7 +74,11 @@ public class SocketThread extends Thread {
 
 			// execute handler based on input
 			String response = executeHandler(input, mail);
-			out.println(response);
+			if (!response.equals(SmtpResponse.DATA_RECEIVED)) {
+				out.println(response);
+			} else {
+				System.out.println(response);
+			}
 
 			// close connection if header is QUIT
 			if (response.equals(SmtpResponse.QUIT)) {
