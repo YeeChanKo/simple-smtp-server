@@ -1,4 +1,4 @@
-package smtp.server;
+package smtp.server.model;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import smtp.server.handler.SmtpResponse;
+import smtp.server.constant.SmtpResponse;
 
 public class Mail {
 
@@ -76,6 +76,7 @@ public class Mail {
 			mail.put("recipients", recipients);
 			mail.put("data", dataContent);
 			out.writeObject(mail);
+			out.flush();
 			return SmtpResponse.OKAY;
 		} catch (IOException e) {
 			e.printStackTrace();

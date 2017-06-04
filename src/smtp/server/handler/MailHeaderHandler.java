@@ -3,7 +3,8 @@ package smtp.server.handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import smtp.server.Mail;
+import smtp.server.constant.SmtpResponse;
+import smtp.server.model.Mail;
 
 public class MailHeaderHandler implements SmtpHandler {
 

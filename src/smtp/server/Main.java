@@ -6,13 +6,13 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import smtp.server.constant.SmtpHeader;
 import smtp.server.handler.DataHeaderHandler;
 import smtp.server.handler.SmtpHandler;
 import smtp.server.handler.HeloHeaderHandler;
 import smtp.server.handler.MailHeaderHandler;
 import smtp.server.handler.QuitHeaderHandler;
 import smtp.server.handler.RcptHeaderHandler;
-import smtp.server.handler.SmtpHeader;
 
 public class Main {
 

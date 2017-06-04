@@ -1,4 +1,4 @@
-package smtp.server.handler;
+package smtp.server.constant;
 
 public class SmtpResponse {
 	public static final String READY = "220 Service ready";

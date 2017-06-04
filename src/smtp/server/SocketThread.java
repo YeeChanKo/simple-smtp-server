@@ -6,10 +6,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 
+import smtp.server.constant.SmtpHeader;
+import smtp.server.constant.SmtpResponse;
 import smtp.server.handler.DataBodyHandler;
 import smtp.server.handler.SmtpHandler;
-import smtp.server.handler.SmtpHeader;
-import smtp.server.handler.SmtpResponse;
+import smtp.server.model.Mail;
 
 public class SocketThread extends Thread {
 
@@ -47,7 +48,7 @@ public class SocketThread extends Thread {
 		while (true) {
 			// check if client disconnected
 			try {
-				in.mark(100); // 100 chars read ahead limit
+				in.mark(2); // 2 chars read ahead limit
 				if (in.read() == -1) {
 					System.out.println(
 							String.format("%s:%s CONNECTION CLOSED BY CLIENT!",
